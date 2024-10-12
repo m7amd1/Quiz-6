@@ -1,5 +1,4 @@
 let tasks = [];
-
 console.log(`Task Manager Menu 
     1. Add Task
     2. View Tasks
@@ -8,7 +7,20 @@ console.log(`Task Manager Menu
     5. Delete Task
     6. Exit`);
 
-    function showMenu() {
+// retrieve tasks from local storage
+function loadTasks() {
+  const storedTasks = localStorage.getItem("tasks");
+  if (storedTasks) {
+    tasks = JSON.parse(storedTasks);
+  }
+}
+
+// Save tasks to local storage
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function showMenu() {
   const input = prompt("Please enter a number from 1 to 6");
 
   if (input === null) {
@@ -42,21 +54,20 @@ console.log(`Task Manager Menu
       showMenu();
   }
 
-  showMenu(); 
+  showMenu();
 }
 
-// add task
 function addTask() {
-  const taskName = prompt("Enter The Task Name:");
+  const taskName = prompt("Enter the task name:");
   if (taskName) {
     tasks.push({ name: taskName, completed: false });
+    saveTasks(); // Save tasks to local storage
     console.log(`Task "${taskName}" added.`);
   } else {
-    console.error("Task Name cannot be empty.");
+    console.error("Task name cannot be empty.");
   }
 }
 
-// view tasks
 function viewTasks() {
   if (tasks.length === 0) {
     console.log("No tasks to display.");
@@ -72,24 +83,23 @@ function viewTasks() {
   }
 }
 
-// toggle task completion
 function toggleTaskCompletion() {
   const taskIndex = prompt("Enter the task number to toggle completion:");
   const index = Number(taskIndex) - 1;
 
   if (index >= 0 && index < tasks.length) {
     tasks[index].completed = !tasks[index].completed;
+    saveTasks();
     console.log(
       `Task "${tasks[index].name}" is now marked as ${
         tasks[index].completed ? "Completed" : "Pending"
-      }.`
+      }`
     );
   } else {
     console.error("Invalid task number.");
   }
 }
 
-// edit task
 function editTask() {
   const taskIndex = prompt("Enter the task number to edit:");
   const index = Number(taskIndex) - 1;
@@ -99,6 +109,7 @@ function editTask() {
     if (newTaskName) {
       console.log(`Task "${tasks[index].name}" renamed to "${newTaskName}".`);
       tasks[index].name = newTaskName;
+      saveTasks();
     } else {
       console.error("New task name cannot be empty.");
     }
@@ -107,7 +118,6 @@ function editTask() {
   }
 }
 
-// delete a task
 function deleteTask() {
   const taskIndex = prompt("Enter the task number to delete:");
   const index = Number(taskIndex) - 1;
@@ -115,9 +125,12 @@ function deleteTask() {
   if (index >= 0 && index < tasks.length) {
     console.log(`Task "${tasks[index].name}" deleted.`);
     tasks.splice(index, 1);
+    saveTasks();
   } else {
     console.error("Invalid task number.");
   }
 }
+
+loadTasks();
 
 showMenu();
